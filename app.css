@@ -1,0 +1,55 @@
+#my-interest {
+	font-family : sans-serif;
+	line-height : 1.618;
+}
+
+#impact-results {
+	list-style-type : none;
+	padding-left : 0;
+}
+
+#impact-results li {
+	border : .3em solid #555;
+	margin : 0 0 .75em;
+	padding : 0;
+	max-width: 40em;
+}
+
+.impact-description {
+	background-color : #d6d6d6;
+	display : block;
+	padding : .5em 1em .33em;
+}
+
+.impact-give-link {
+	background-color : #626d66;
+	color : #fff;
+	display : block;
+	overflow : hidden;
+	text-decoration : none;
+}
+
+.impact-give-link-amount, .impact-give-link-label  {
+	display : inline-block;
+	padding : .5em 1em .33em;
+}
+
+.impact-give-link-amount {
+	background-color : #0096d6;
+}
+
+.impact-give-link-label {
+	background-color : #7ac143;
+}
+
+.impact-give-link:hover {
+	background-color : #4e5651;
+}
+
+.impact-give-link:hover > .impact-give-link-amount {
+	background-color : #13a3e0;
+}
+
+.impact-give-link:hover > .impact-give-link-label {
+	background-color : #90d25d;
+}
