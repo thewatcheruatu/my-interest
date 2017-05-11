@@ -1,2 +1,4 @@
+config.php
+*.bak
 *.swp
 error_log
