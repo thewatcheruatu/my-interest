@@ -13,8 +13,17 @@
 					return designees[designeeId];
 				},
 
+				getPowerAndPromiseId : function() {
+					return 1001;
+				},
+
 				getMajor : function( majorDesigneeId ) {
 					return majorDesignees[majorDesigneeId];
+				},
+
+				getSub : function( majorDesigneeId ) {
+					const subs = dMap[majorDesigneeId];
+					return subs.length ? subs[0] : null;
 				},
 
 				set : function( data ) {
@@ -152,6 +161,7 @@
 					const amount = $amountSelect.val();
 					const majorDesigneeId = $majorDesigneeSelect.val();
 					const filters = {};
+					let html;
 
 					if ( majorDesigneeId !== '' ) {
 						filters.majorDesigneeId = parseInt( majorDesigneeId, 10 );
@@ -161,14 +171,32 @@
 					}
 
 					const filteredImpacts = Impacts.get( filters );
+
 					if ( ! filteredImpacts.length ) {
-						$resultList.html( '' );
-						return;
+						html = _makeGenericResultHtml();
+					} else {
+						html = filteredImpacts.reduce( ( a, c ) => {
+							return a + _makeImpactResultHtml( c );
+						}, '' );
 					}
-					const html = filteredImpacts.reduce( ( a, c ) => {
-						return a + _makeImpactResultHtml( c );
-					}, '' );
+
 					$resultList.html( html );
+
+					function _makeGenericResultHtml() {
+						const genericImpact = {
+							amount : filters.amount || 25,
+							description : 'Provides unrestricted support for GW students and faculty.',
+							major_designee_id : filters.majorDesigneeId || null,
+						};
+
+						if ( filters.majorDesigneeId ) {
+							genericImpact.designee_id = Designees.getSub( filters.majorDesigneeId );
+						}
+
+						console.log( genericImpact );
+
+						return _makeImpactResultHtml( genericImpact );
+					}
 
 					function _makeImpactResultHtml( impact ) {
 						const majorDesignee = Designees.getMajor( impact.major_designee_id );
@@ -187,7 +215,8 @@
 							'1382.donation=form1&set.SingleDesignee=' + impact.designee_id + 
 							'&set.DonationLevel=' + donationLevels[impact.amount] +
 							( impact.amount === 25 ? '&set.Value=2500' : '' );
-						const linkLabel = 'Give to ' + majorDesignee.short_name;
+						const linkLabel = 'Give to ' + 
+							( majorDesignee ? majorDesignee.short_name : 'GW' );
 
 						return '<li><span class="impact-description">' + impact.description + 
 							' </span><a class="impact-give-link" href="' + url + '">' +
@@ -220,14 +249,20 @@
 			}
 
 			function handleFatalError( error ) {
-				console.log( 'error', error );
-				$myInterest.html( '<h2>Could Not Load My Interest Data</h2>' );
+				$myInterest.html(
+					'<p id="app-loading-message" class="error">We\'re sorry. ' +
+					'Something went wrong while attempting to load application.</p>'
+				);
 			}
 
 			function init() {
 				$myInterest = $( '#my-interest' );
+				$myInterest.html(
+					'<p id="app-loading-message">Loading...</p>'
+				);
 				getData()
 					.then( ( _data ) => {
+						$myInterest.html( '' );
 						make( _data );
 						attachEventHandlers();
 					} )
@@ -252,10 +287,21 @@
 				_makeMajorDesigneesSelect();
 				_makeAmountSelect();
 				_makeResultList();
-				$myInterest
+				$( 
+					'<p><label class="my-interest-filter">I want to support: \n' +
+					'</label></p>' 
+				)
 					.append( $majorDesigneeSelect )
+					.appendTo( $myInterest );
+
+				$( 
+					'<p><label class="my-interest-filter">I want to give: \n' +
+					'</label></p>' 
+				)
 					.append( $amountSelect )
-					.append( $resultList );
+					.appendTo( $myInterest );
+
+				$myInterest.append( $resultList );
 
 				function _makeAmountSelect() {
 					let html;
@@ -269,7 +315,7 @@
 						'<option value="1000">$1000</option>\n' +
 						'<option value="2500">$2500</option>\n' +
 						'<option value="5000">$5000</option>\n' +
-						'</select>\n';
+						'</select>\n</label></p>\n';
 
 					$amountSelect = $( html );
 				}
@@ -290,7 +336,7 @@
 							'data-short-name="' + md.short_name.replace( /['\s]/g, '').toLowerCase() + '">' +
 							md.long_name + '</option>\n';
 					}
-					html += '</select>\n';
+					html += '</select>\n</label></p>\n';
 					$majorDesigneeSelect = $( html );
 				}
 
