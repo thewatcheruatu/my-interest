@@ -101,29 +101,53 @@
 
 			function attachEventHandlers() {
 				/*
-				 * Want to update the impact list on document.ready.
 				 * These event handlers won't get attached until data has been retrieved
 				 * and the application has been made.
 				**/
-				$( updateImpactsList );
+				$amountSelect.on( 'change', _amountChange );
+				$majorDesigneeSelect.on( 'change', _majorDesigneeChange );
 				/*
-				 * These two handlers are the same. Don't think they'll ever have to
-				 * be different, but I kept them separate just in case.
-				*/
-				$amountSelect.on( 'change', amountChange );
-				$majorDesigneeSelect.on( 'change', majorDesigneeChange );
+				 * On document ready, check the query string for pre-population purposes.
+				**/
+				$( () => {
+					const qs = _queryStringGetParams( 'majorDesignee' );
 
-				function amountChange( e ) {
+					if ( ! Object.keys( qs ).length ) {
+						setAmountSelect( '25' );
+					} else {
+						if ( qs.majorDesignee ) {
+							setMajorDesigneeSelect( qs.majorDesignee );
+						}
+						if ( qs.amount ) {
+							setAmountSelect( qs.amount );
+						}
+					}
+
+					function _queryStringGetParams( paramName ) {
+						const qs = location.search.replace( /^\?/, '' ).split( '&' );
+						const params = qs.reduce( ( a, c ) => {
+							const param = c.split( '=' );
+							if ( param.length > 1 ) {
+								a[param[0]] = param[1];
+							}
+							return a;
+						}, {} );
+
+						return params;
+					}
+				} );
+
+				function _amountChange( e ) {
 					e.preventDefault();
-					updateImpactsList();
+					_updateImpactsList();
 				}
 
-				function majorDesigneeChange( e ) {
+				function _majorDesigneeChange( e ) {
 					e.preventDefault();
-					updateImpactsList();
+					_updateImpactsList();
 				}
 
-				function updateImpactsList() {
+				function _updateImpactsList() {
 					const amount = $amountSelect.val();
 					const majorDesigneeId = $majorDesigneeSelect.val();
 					const filters = {};
@@ -274,6 +298,22 @@
 					);
 				}
 
+			}
+
+			function setAmountSelect( amount ) {
+				if ( 
+					$amountSelect
+						.find( 'option[value=' + amount + ']' ).length ) {
+					$amountSelect.val( amount ).trigger( 'change' );
+				}
+			}
+
+			function setMajorDesigneeSelect( majorDesigneeId ) {
+				if ( 
+					$majorDesigneeSelect
+						.find( 'option[value=' + majorDesigneeId + ']' ).length ) {
+					$majorDesigneeSelect.val( majorDesigneeId ).trigger( 'change' );
+				}
 			}
 
 			return {
