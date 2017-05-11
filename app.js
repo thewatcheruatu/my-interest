@@ -115,6 +115,7 @@
 					if ( ! Object.keys( qs ).length ) {
 						setAmountSelect( '25' );
 					} else {
+						// Potentially triggering two repaints here, but NBD I guess.
 						if ( qs.majorDesignee ) {
 							setMajorDesigneeSelect( qs.majorDesignee );
 						}
@@ -285,7 +286,8 @@
 							continue;
 						}
 						html += 
-							'<option value="' + md.major_designee_id + '">' +
+							'<option value="' + md.major_designee_id + '" ' +
+							'data-short-name="' + md.short_name.replace( /['\s]/g, '').toLowerCase() + '">' +
 							md.long_name + '</option>\n';
 					}
 					html += '</select>\n';
@@ -301,6 +303,7 @@
 			}
 
 			function setAmountSelect( amount ) {
+				amount = amount.replace( '$', '' );
 				if ( 
 					$amountSelect
 						.find( 'option[value=' + amount + ']' ).length ) {
@@ -308,11 +311,29 @@
 				}
 			}
 
-			function setMajorDesigneeSelect( majorDesigneeId ) {
-				if ( 
-					$majorDesigneeSelect
-						.find( 'option[value=' + majorDesigneeId + ']' ).length ) {
-					$majorDesigneeSelect.val( majorDesigneeId ).trigger( 'change' );
+			function setMajorDesigneeSelect( majorDesignee ) {
+				/*
+				 * majorDesignee might be the numeric ID or the short name
+				**/
+				if ( /^\d+$/.test( majorDesignee ) ) {
+					// Numeric ID
+					if ( 
+						$majorDesigneeSelect
+							.find( 'option[value=' + majorDesignee + ']' )
+							.length 
+					) {
+						$majorDesigneeSelect.val( majorDesignee ).trigger( 'change' );
+					}
+				} else {
+					// Short name
+					majorDesignee = majorDesignee.toLowerCase().replace( /[+\s']g/, '' );
+					const mdOption = $majorDesigneeSelect
+						.find( 'option[data-short-name=' + majorDesignee + ']' );
+					if ( mdOption.length ) {
+						$majorDesigneeSelect
+							.val( mdOption.attr( 'value' ) )
+							.trigger( 'change' );
+					}
 				}
 			}
 
