@@ -372,7 +372,7 @@
 					}
 				} else {
 					// Short name
-					majorDesignee = majorDesignee.toLowerCase().replace( /[+\s']g/, '' );
+					majorDesignee = majorDesignee.toLowerCase().replace( /[\+\s']/g, '' );
 					const mdOption = $majorDesigneeSelect
 						.find( 'option[data-short-name=' + majorDesignee + ']' );
 					if ( mdOption.length ) {
