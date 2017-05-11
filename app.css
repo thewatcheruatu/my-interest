@@ -53,3 +53,17 @@
 .impact-give-link:hover > .impact-give-link-label {
 	background-color : #90d25d;
 }
+
+.my-interest-filter {
+	font-weight : bold;
+}
+
+.my-interest-filter > select {
+	display : block;
+}
+
+@media only screen and ( min-width: 50em ) {
+	.my-interest-filter > select {
+		display : inline-block;
+	}
+}
