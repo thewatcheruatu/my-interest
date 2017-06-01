@@ -1,3 +1,6 @@
+// Uncomment if polyfilling through webpack
+//import 'babel-polyfill';
+
 'use strict';
 
 ( function( $ ) {
@@ -229,6 +232,7 @@
 
 			function getData() {
 				const url = 'http://gwalumni.org/projects/my-interest/index.php';
+				//const url = 'test-data.json';
 
 				return new Promise( ( resolve, reject ) => {
 					$.ajax( {
